@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع الفيزياء - تحقق من الإجابة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.11.0/jquery.typeahead.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MathJax/2.7.7/MathJax.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            direction: rtl;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #ffcc00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .physics-icon {
+            font-size: 32px;
+            color: #ffcc00;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 10px #ffcc00;
+            }
+            50% {
+                transform: scale(1.2);
+                text-shadow: 0 0 20px #ffcc00;
+            }
+            100% {
+                transform: scale(1);
+                text-shadow: 0 0 10px #ffcc00;
+            }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #2c2c2c;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+            text-align: right;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        textarea {
+            width: calc(100% - 60px);
+            padding: 12px;
+            font-size: 16px;
+            background-color: #3b3b3b;
+            color: #f5f5f5;
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-sizing: border-box;
+            min-height: 120px;
+            outline: none;
+            resize: vertical;
+        }
+
+        .icon-upload {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .icon-upload i {
+            font-size: 28px;
+            color: #ffcc00;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s;
+            background-color: #2c2c2c;
+            border: 2px solid #ffcc00;
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .icon-upload i:hover {
+            color: #ffffff;
+            background-color: #444;
+            transform: scale(1.1);
+        }
+
+        .icon-upload input[type="file"] {
+            display: none;
+        }
+
+        #uploaded-question, #uploaded-answer {
+            display: block;
+            margin-top: 10px;
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ffcc00;
+            border-radius: 8px;
+        }
+
+        .symbols-icon {
+            font-size: 28px;
+            color: #ffcc00;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s;
+            background-color: #2c2c2c;
+            border: 2px solid #ffcc00;
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: translateX(-50%);
+        }
+
+        .symbols-icon:hover {
+            color: #ffffff;
+            background-color: #444;
+            transform: scale(1.1);
+        }
+
+        .symbols-table {
+            display: none;
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+            margin-top: 10px;
+            padding: 10px;
+            text-align: right;
+            position: absolute;
+            width: calc(100% - 60px);
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            left: 50px;
+        }
+
+        .symbols-category {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffcc00;
+        }
+
+        .symbols-table span {
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 24px;
+            color: #ffcc00;
+            display: inline-block;
+            padding: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .symbols-table span:hover {
+            background-color: #444;
+            border-radius: 5px;
+            transform: scale(1.1);
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #444;
+            color: #f5f5f5;
+            border: none;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #555;
+            transform: scale(1.05);
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .social-media {
+            margin-top: 20px;
+        }
+
+        .social-media a {
+            color: #ffcc00;
+            font-size: 24px;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .social-media a:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            textarea {
+                width: calc(100% - 40px);
+            }
+
+            .symbols-table {
+                width: calc(100% - 40px);
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1><i class="fas fa-atom physics-icon"></i> موقع الفيزياء - تحقق من الإجابة</h1>
+
+    <div class="container">
+        <div class="input-group">
+            <label for="question">اكتب السؤال الفيزيائي:</label>
+            <i class="fas fa-superscript symbols-icon" onclick="toggleSymbols()" title="إدراج الرموز الفيزيائية"></i>
+            <textarea id="question" placeholder="اكتب السؤال هنا..."></textarea>
+            <div class="icon-upload">
+                <i class="fas fa-image" onclick="document.getElementById('questionImage').click()" title="رفع صورة للسؤال"></i>
+                <input type="file" id="questionImage" accept="image/*" onchange="previewImage(event, 'uploaded-question')">
+            </div>
+            <img id="uploaded-question" style="display: none;">
+            <div id="symbols" class="symbols-table">
+                <!-- رموز الكميات الفيزيائية الأساسية -->
+<span onclick="insertSymbol('𝐹')">𝐹</span> <!-- القوة -->
+<span onclick="insertSymbol('𝑚')">𝑚</span> <!-- الكتلة -->
+<span onclick="insertSymbol('𝑎')">𝑎</span> <!-- التسارع -->
+<span onclick="insertSymbol('𝑣')">𝑣</span> <!-- السرعة -->
+<span onclick="insertSymbol('𝑡')">𝑡</span> <!-- الزمن -->
+<span onclick="insertSymbol('𝑥')">𝑥</span> <!-- الإزاحة -->
+<span onclick="insertSymbol('𝑠')">𝑠</span> <!-- المسافة -->
+<span onclick="insertSymbol('𝑊')">𝑊</span> <!-- العمل -->
+<span onclick="insertSymbol('𝐸')">𝐸</span> <!-- الطاقة -->
+<span onclick="insertSymbol('𝑃')">𝑃</span> <!-- القدرة -->
+<span onclick="insertSymbol('𝑘')">𝑘</span> <!-- ثابت النابض -->
+<span onclick="insertSymbol('𝑞')">𝑞</span> <!-- الشحنة الكهربائية -->
+<span onclick="insertSymbol('𝐼')">𝐼</span> <!-- التيار الكهربائي -->
+<span onclick="insertSymbol('𝑅')">𝑅</span> <!-- المقاومة الكهربائية -->
+<span onclick="insertSymbol('𝑉')">𝑉</span> <!-- الجهد الكهربائي -->
+<span onclick="insertSymbol('𝐵')">𝐵</span> <!-- المجال المغناطيسي -->
+<span onclick="insertSymbol('𝜇')">𝜇</span> <!-- النفاذية المغناطيسية -->
+<span onclick="insertSymbol('𝑔')">𝑔</span> <!-- تسارع الجاذبية -->
+<span onclick="insertSymbol('𝐺')">𝐺</span> <!-- ثابت الجاذبية العام -->
+<span onclick="insertSymbol('ℏ')">ℏ</span> <!-- ثابت بلانك المخفض -->
+<span onclick="insertSymbol('𝑐')">𝑐</span> <!-- سرعة الضوء -->
+<span onclick="insertSymbol('𝜆')">𝜆</span> <!-- الطول الموجي -->
+<span onclick="insertSymbol('𝑓')">𝑓</span> <!-- التردد -->
+<span onclick="insertSymbol('𝜈')">𝜈</span> <!-- تردد الفوتون -->
+<span onclick="insertSymbol('𝐸')">𝐸</span> <!-- الطاقة (مثل E = mc²) -->
+<span onclick="insertSymbol('𝐻')">𝐻</span> <!-- ثابت بلانك -->
+<span onclick="insertSymbol('𝜀₀')">𝜀₀</span> <!-- السماحية الكهربائية للفراغ -->
+<span onclick="insertSymbol('𝑃𝑟')">𝑃𝑟</span> <!-- الضغط -->
+<span onclick="insertSymbol('𝑉')">𝑉</span> <!-- الحجم -->
+<span onclick="insertSymbol('𝑛')">𝑛</span> <!-- عدد المولات -->
+<span onclick="insertSymbol('𝑇')">𝑇</span> <!-- درجة الحرارة -->
+<span onclick="insertSymbol('𝑅')">𝑅</span> <!-- ثابت الغاز العام -->
+<span onclick="insertSymbol('𝜎')">𝜎</span> <!-- الإجهاد -->
+<span onclick="insertSymbol('𝜀')">𝜀</span> <!-- الاستطالة -->
+<span onclick="insertSymbol('𝜌')">𝜌</span> <!-- الكثافة -->
+<span onclick="insertSymbol('𝜎')">𝜎</span> <!-- الموصلية الكهربائية -->
+<span onclick="insertSymbol('𝜌')">𝜌</span> <!-- المقاومة النوعية -->
+<span onclick="insertSymbol('𝛼')">𝛼</span> <!-- معامل التمدد الحراري -->
+<span onclick="insertSymbol('𝑅𝑒')">𝑅𝑒</span> <!-- رقم رينولدز -->
+
+<!-- رموز الدوال المثلثية -->
+<span onclick="insertSymbol('sin(θ)')">sin(θ)</span>
+<span onclick="insertSymbol('cos(θ)')">cos(θ)</span>
+<span onclick="insertSymbol('tan(θ)')">tan(θ)</span>
+<span onclick="insertSymbol('csc(θ)')">csc(θ)</span>
+<span onclick="insertSymbol('sec(θ)')">sec(θ)</span>
+<span onclick="insertSymbol('cot(θ)')">cot(θ)</span>
+<span onclick="insertSymbol('arcsin(θ)')">arcsin(θ)</span>
+<span onclick="insertSymbol('arccos(θ)')">arccos(θ)</span>
+<span onclick="insertSymbol('arctan(θ)')">arctan(θ)</span>
+
+<!-- رموز العمليات الأساسية -->
+<span onclick="insertSymbol('+')">+</span>
+<span onclick="insertSymbol('-')">-</span>
+<span onclick="insertSymbol('×')">×</span>
+<span onclick="insertSymbol('÷')">÷</span>
+<span onclick="insertSymbol('=')">=</span>
+<span onclick="insertSymbol('≠')">≠</span>
+<span onclick="insertSymbol('<')"><</span>
+<span onclick="insertSymbol('>')">></span>
+<span onclick="insertSymbol('≤')">≤</span>
+<span onclick="insertSymbol('≥')">≥</span>
+<span onclick="insertSymbol('≈')">≈</span>
+<span onclick="insertSymbol('∞')">∞</span>
+<span onclick="insertSymbol('√')">√</span>
+
+<!-- رموز الجبر -->
+<span onclick="insertSymbol('a²')">𝑎²</span>
+<span onclick="insertSymbol('a³')">𝑎³</span>
+<span onclick="insertSymbol('xⁿ')">𝑥ⁿ</span>
+<span onclick="insertSymbol('∑')">∑</span> <!-- المجموع -->
+<span onclick="insertSymbol('∏')">∏</span> <!-- حاصل الضرب -->
+<span onclick="insertSymbol('Δ')">Δ</span> <!-- دلتا -->
+<span onclick="insertSymbol('∫')">∫</span> <!-- التكامل -->
+<span onclick="insertSymbol('∇')">∇</span> <!-- التدرج -->
+
+<!-- رموز القيمة المطلقة واللوغاريتمات -->
+<span onclick="insertSymbol('|a|')">|𝑎|</span>
+<span onclick="insertSymbol('log(x)')">log(𝑥)</span>
+<span onclick="insertSymbol('ln(x)')">ln(𝑥)</span>
+
+<!-- رموز المتجهات -->
+<span onclick="insertSymbol('→')">→</span>
+<span onclick="insertSymbol('·')">·</span> <!-- الضرب القياسي -->
+<span onclick="insertSymbol('×')">×</span> <!-- الضرب الاتجاهي -->
+
+<!-- رموز هندسية -->
+<span onclick="insertSymbol('∠')">∠</span> <!-- الزاوية -->
+<span onclick="insertSymbol('⊥')">⊥</span> <!-- عمودي -->
+<span onclick="insertSymbol('∥')">∥</span> <!-- متوازي -->
+<span onclick="insertSymbol('π')">π</span> <!-- باي -->
+
+<!-- رموز المجموعات -->
+<span onclick="insertSymbol('∈')">∈</span>
+<span onclick="insertSymbol('∉')">∉</span>
+<span onclick="insertSymbol('⊂')">⊂</span>
+<span onclick="insertSymbol('⊃')">⊃</span>
+<span onclick="insertSymbol('⊆')">⊆</span>
+<span onclick="insertSymbol('⊇')">⊇</span>
+<span onclick="insertSymbol('∪')">∪</span>
+<span onclick="insertSymbol('∩')">∩</span>
+<span onclick="insertSymbol('∅')">∅</span>
+<span onclick="insertSymbol('∀')">∀</span>
+<span onclick="insertSymbol('∃')">∃</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="answer">اكتب الإجابة:</label>
+            <textarea id="answer" placeholder="اكتب الإجابة هنا..."></textarea>
+            <div class="icon-upload">
+                <i class="fas fa-image" onclick="document.getElementById('answerImage').click()" title="رفع صورة للإجابة"></i>
+                <input type="file" id="answerImage" accept="image/*" onchange="previewImage(event, 'uploaded-answer')">
+            </div>
+            <img id="uploaded-answer" style="display: none;">
+        </div>
+        <div class="buttons-container">
+            <button onclick="checkAnswer()">تحقق من الإجابة</button>
+            <button onclick="clearFields()">السؤال التالي</button>
+        </div>
+        <div id="result" class="result"></div>
+        <div class="social-media">
+            <a href="https://www.facebook.com/share/ipBmpRx8n7BcxkjU/?mibextid=qi2Omg" target="_blank" title="فيسبوك"><i class="fab fa-facebook"></i></a>
+            <a href="https://x.com/SeEbrahemsobhy?t=aSR-AWtje-9G4yLV65mvmQ&s=09" target="_blank" title="تويتر"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.instagram.com/ebrahemsobhy221/profilecard/?igsh=dXEyMmlmanc4dm41" target="_blank" title="إنستاجرام"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.11.0/jquery.typeahead.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/MathJax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script>
+        function toggleSymbols() {
+            const symbolsTable = document.getElementById('symbols');
+            symbolsTable.style.display = symbolsTable.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function insertSymbol(symbol) {
+            const questionTextarea = document.getElementById('question');
+            questionTextarea.value += symbol;
+            toggleSymbols();
+        }
+
+        function previewImage(event, imgId) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const img = document.getElementById(imgId);
+                img.src = reader.result;
+                img.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function checkAnswer() {
+            const question = document.getElementById('question').value.trim();
+            const answer = document.getElementById('answer').value.trim();
+
+            if (!question || !answer) {
+                document.getElementById('result').innerText = 'يرجى إدخال السؤال والإجابة';
+                return;
+            }
+
+            // مثال بسيط للتحقق من الإجابة
+            if (question === answer) {
+                document.getElementById('result').innerText = 'الإجابة صحيحة!';
+            } else {
+                document.getElementById('result').innerText = `الحل خطأ. السؤال هو: ${question}`;
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('question').value = '';
+            document.getElementById('answer').value = '';
+            document.getElementById('uploaded-question').style.display = 'none';
+            document.getElementById('uploaded-answer').style.display = 'none';
+            document.getElementById('result').innerText = '';
+        }
+    </script>
+</body>
+</html>
